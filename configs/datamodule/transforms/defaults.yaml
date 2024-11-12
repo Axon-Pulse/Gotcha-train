@@ -1,0 +1,15 @@
+train:
+  order: ["Resize", "ToTensor"]
+  Resize:
+    _target_: torchvision.transforms.Resize
+    size: [256, 512]
+  ToTensor:
+    _target_: torchvision.transforms.ToTensor
+
+valid_test_predict:
+  order: ["Resize", "Flip", "ToTensor"]
+  # other method for using the transformation from the global config,
+  # thus define on the transformation/transformation_list.yaml its better to use this way for loggability
+  Resize: ${transformation.Resize}
+  Flip: ${transformation.Flip}
+  ToTensor: ${transformation.ToTensor}

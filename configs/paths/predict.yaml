@@ -1,0 +1,5 @@
+defaults:
+  - default
+
+# path to data directory
+data_dir: ${paths.root_dir}/visual/examples_data_samples/ISAR/

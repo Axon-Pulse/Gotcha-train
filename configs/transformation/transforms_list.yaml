@@ -1,0 +1,40 @@
+# For costume transformation:
+# you can use this form of transformation instant,
+# but you can also create your own class for transformation, for example:
+# 1. create my_transform.py on src/my_transform.py
+# 2. write a hydria style instant for my_transform.py
+#   MyTransform:
+#   _target_: src.my_transform.MyTransform
+#   params:
+#     ...
+#  3. drop it here and or in the data/data_module.yaml train/test...
+
+Resize:
+  _target_: torchvision.transforms.Resize
+  size: [256, 512]
+
+Flip:
+  _target_: torchvision.transforms.RandomHorizontalFlip
+  p: 0.5
+
+TodB:
+  _target_: src.utils.custom_transforms.TodB
+
+ToTensor:
+  _target_: torchvision.transforms.ToTensor
+
+Normalize:
+  _target_: torchvision.transforms.Normalize
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+
+RandomCrop:
+  _target_: torchvision.transforms.RandomCrop
+  size: [224, 224]
+
+ColorJitter:
+  _target_: torchvision.transforms.ColorJitter
+  brightness: 0.2
+  contrast: 0.2
+  saturation: 0.2
+  hue: 0.1

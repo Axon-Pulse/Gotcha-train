@@ -1,0 +1,19 @@
+# @package _global_
+
+defaults:
+  - _self_
+  - datamodule: isar # choose datamodule with `test_dataloader()` for evaluation
+  - model: isar
+  - logger: null
+  - trainer: gpu
+  - paths: default
+  - extras: default
+  - hydra: default
+  - transformation: transforms_list
+
+task_name: "eval"
+
+tags: ["dev"]
+
+# passing checkpoint path is necessary for evaluation
+ckpt_path: ???

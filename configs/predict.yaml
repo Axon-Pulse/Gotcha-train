@@ -1,0 +1,21 @@
+# @package _global_
+
+defaults:
+  - _self_
+  - datamodule: isar # choose datamodule with `test_dataloader()` for evaluation
+  - model: isar
+  - logger: null
+  - trainer: gpu
+  - paths: predict
+  - extras: default
+  - hydra: default
+  - transformation: transforms_list
+
+task_name: "predict"
+
+tags: ["dev"]
+
+# passing checkpoint path is necessary for evaluation
+ckpt_path: /home/roee/Documents/Projects/ISAR4/Code/ISAR_Hy/checkpoints/dummy_ckpy_from_Saar.ckpt
+
+lunch_gradio_app: true

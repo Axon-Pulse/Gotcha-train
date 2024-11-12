@@ -1,0 +1,28 @@
+_target_: src.models.isar_module.IsarClassifier
+
+number_of_classes: 2
+
+input_shape:
+  - 1
+  - 256
+  - 512
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.001
+  weight_decay: 0.0
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 10
+
+net:
+  _target_: src.models.components.simple_autocoder.ClassificationHead
+  n_classes: 2
+  p_dropout: 0.3
+
+compile: False
