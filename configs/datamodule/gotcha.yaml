@@ -1,0 +1,42 @@
+_target_: src.datamodule.gotcha_PL_datamodule.GotchaDataModule
+
+defaults:
+  - _self_
+  - transforms: defaults.yaml
+
+batch_size: 1 # Needs to be divisible by the number of devices (e.g., if in a distributed setup)
+num_workers: 4
+pin_memory: True
+
+datasets:
+  train_val_test_split: [0.6, 0.2, 0.2]
+
+  main:
+    _target_: src.datamodule.components.gotcha_dataset.GotchaDataset
+    # csv_path: ${paths.data_dir}/gt_file.csv
+    csv_path: '/home/daniel/Documents/Gotcha/first_drone_exp_filtered/recs_df.csv'
+    # csv_path_labels: '/home/daniel/Documents/Gotcha/first_drone_exp_filtered/gt.pkl'
+    
+    build_from_raw_data: False
+    dataset_keys: #labels mapping in the dataframe
+      df_raw_data_sample_key: "full_path" # key in the dataset for the path of the sample
+      # label_keys: ["bsn", "dwell", "rg", "dg", "snr", "range", "range_rate"] #
+
+    # can also define train, valid, test, one by one, instead of split from 'main' one...
+    # NOTE: make sure you remove the train_val_test_split if costume split is not in use!
+
+  predict:
+    dataset1:
+      _target_: src.datamodule.components.generic_dataset.GenericDataset
+      csv_path: ${paths.data_dir}/gt_file.csv
+      # csv_path: ${paths.root_dir}data/ISAR/isar_dataset.csv
+      build_from_raw_data: False
+      dataset_keys:
+        df_raw_data_sample_key: ["npy_path"]
+        # label_keys: ["bsn", "dwell", "rg", "dg", "snr", "range", "range_rate"]
+
+    # or multiple
+    #
+    #dataset2:
+    #  _target_: src.datamodules....
+    #...
