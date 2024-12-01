@@ -9,32 +9,39 @@
 #     ...
 #  3. drop it here and or in the data/data_module.yaml train/test...
 
-Resize:
-  _target_: torchvision.transforms.Resize
-  size: [256, 512]
+# Resize:
+#   _target_: torchvision.transforms.Resize
+#   size: [256, 512]
 
-Flip:
-  _target_: torchvision.transforms.RandomHorizontalFlip
+# Flip:
+#   _target_: torchvision.transforms.RandomHorizontalFlip
+#   p: 0.5
+
+# TodB:
+#   _target_: src.utils.custom_transforms.TodB
+
+# ToTensor:
+#   _target_: torchvision.transforms.ToTensor
+
+# Normalize:
+#   _target_: torchvision.transforms.Normalize
+#   mean: [0.485, 0.456, 0.406]
+#   std: [0.229, 0.224, 0.225]
+
+# RandomCrop:
+#   _target_: torchvision.transforms.RandomCrop
+#   size: [224, 224]
+
+# ColorJitter:
+#   _target_: torchvision.transforms.ColorJitter
+#   brightness: 0.2
+#   contrast: 0.2
+#   saturation: 0.2
+#   hue: 0.1
+
+
+# Daniel
+FlipAugmentation:
+  _target_: utils.custom_transforms.FlipAugmentation
   p: 0.5
 
-TodB:
-  _target_: src.utils.custom_transforms.TodB
-
-ToTensor:
-  _target_: torchvision.transforms.ToTensor
-
-Normalize:
-  _target_: torchvision.transforms.Normalize
-  mean: [0.485, 0.456, 0.406]
-  std: [0.229, 0.224, 0.225]
-
-RandomCrop:
-  _target_: torchvision.transforms.RandomCrop
-  size: [224, 224]
-
-ColorJitter:
-  _target_: torchvision.transforms.ColorJitter
-  brightness: 0.2
-  contrast: 0.2
-  saturation: 0.2
-  hue: 0.1

@@ -145,8 +145,10 @@ class GotchaPLModule(LightningModule):
         # by default lightning executes validation step sanity checks before training starts,
         # so it's worth to make sure validation metrics don't store results from these checks
         self.val_loss.reset()
+        self.val_acc.reset()
         self.val_acc_best.reset()
 
+        
     def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         """Perform a single training step on a batch of data from the training set.
 
@@ -158,6 +160,9 @@ class GotchaPLModule(LightningModule):
         loss, model_output, targets = self.model_step(batch)
         self.train_loss.update(loss)
         self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True)
+
+        self.train_acc(model_output, targets)
+        self.log("train/acc", self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
         return loss
 
     # ******************************************************************************
@@ -175,27 +180,42 @@ class GotchaPLModule(LightningModule):
         """
         loss, model_output, targets = self.model_step(batch)
         # update and log metrics ## daniel
-        # if self.val_metric:
-        #     val_metric_results = self.val_metric(model_output, targets.int())
-        #     if self.get_metric_plot_func:
-        #         val_metric_plot = self.get_metric_plot_func(val_metric_results)
+        if self.val_metric:
+            # val_metric_results = self.val_metric(model_output.detach().cpu(), targets.detach().cpu().int())
+            self.val_metric.update(model_output.detach().cpu(), targets.detach().cpu().int())
+
+            # if self.get_metric_plot_func:
+            #     val_metric_plot = self.get_metric_plot_func(val_metric_results)
 
         self.val_loss(loss)
         self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=True)
+
+        self.val_acc(model_output, targets)
+        self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
+
         if(batch_idx % 1000==0):
             # self.log_samples(batch[0][0][:50])
             self.log_samples(batch[0][batch[1]['label']==1][:,6:].T,'positive')
             self.log_samples(batch[0][batch[1]['label']==0][:50,6:].T,'negative')
-
+            # self.log_samples(batch[0][0][batch[1]['label']==1][:,6:].T,'positive')
+            # self.log_samples(batch[0][0][batch[1]['label']==0][:50,6:].T,'negative')
 
     def on_validation_epoch_end(self) -> None:
         "Lightning hook that is called when a validation epoch ends."
 
-        # self.val_acc_best(acc)  # update best so far val acc
+
+        acc = self.val_acc.compute()  # get current val acc
+        
+        self.val_acc_best(acc)  # update best so far val acc
         # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # otherwise metric would be reset by lightning after each epoch
-        # self.log("val/acc_best", self.val_acc_best.compute(), sync_dist=True, prog_bar=True)
+        self.log("val/acc_best", self.val_acc_best.compute(), sync_dist=True, prog_bar=True)
 
+
+        val_metric_results = self.val_metric.compute()
+        if self.get_metric_plot_func:
+                val_metric_plot = self.get_metric_plot_func(val_metric_results)
+                self.logger.experiment.log({"Roc": val_metric_plot})
     # ******************************************************************************
     #
     #                       Test

@@ -50,6 +50,8 @@ class Simplest1DCnn(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return  self.seq(x.unsqueeze(dim=2).squeeze(dim=0))[:,0,0].unsqueeze(dim=0)
+        # return  self.seq(x.transpose(2,0).squeeze(dim=1))[:,0,0].unsqueeze(dim=0)
+
         # return self.seq(x[:,:,6:])[:,:,0]
     
 

@@ -5,7 +5,7 @@ defaults:
   - transforms: defaults.yaml
 
 batch_size: 1 # Needs to be divisible by the number of devices (e.g., if in a distributed setup)
-num_workers: 4
+num_workers: 0
 pin_memory: True
 
 datasets:

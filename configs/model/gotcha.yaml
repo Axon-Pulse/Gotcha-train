@@ -14,7 +14,7 @@ p_dropout: 0.3
 optimizer:
   _target_: torch.optim.Adam # target optimizer class
   _partial_: true
-  lr: 0.0001 # Learning rate
+  lr: 0.0000001 # Learning rate
   weight_decay: 0.0
 
 # schedulers parameters
@@ -35,8 +35,8 @@ model:
 # loss parameters
 loss:
   _target_: torch.nn.BCEWithLogitsLoss # nn.Module class loss function
-  # _target_: src.utils.losses.FocalLoss # nn.Module class loss function
-
+  # _target_: src.utils.losses.LossWraper # nn.Module class loss function
+  # lossFunc: src.utils.losses.WBCEWithLogitsLoss
 
 # metrics parameters
 metric:

@@ -4,6 +4,7 @@ from omegaconf import DictConfig
 from torchvision.transforms import transforms as TT
 
 
+
 class TransformsWrapper:
     def __init__(self, transforms_cfg: DictConfig) -> None:
         """TransformsWrapper module.
@@ -25,6 +26,7 @@ class TransformsWrapper:
             augmentations.append(augmentation)
         self.augmentations = TT.Compose(augmentations)
 
+
     def __call__(self, image: Any, **kwargs: Any) -> Any:
         """Apply TransformsWrapper module.
 
@@ -36,3 +38,5 @@ class TransformsWrapper:
             Any: Transformation results.
         """
         return self.augmentations(image, **kwargs)
+
+

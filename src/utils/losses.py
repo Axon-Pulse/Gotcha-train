@@ -33,3 +33,22 @@ class FocalLoss(nn.Module):
         loss = -1 * (1 - pt)**self.gamma * logpt
         if self.size_average: return loss.mean()
         else: return loss.sum()
+
+
+
+class LossWraper(nn.Module):
+    def __init__(self, lossFunc=None,*args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # self.loss = lossFunc 
+        self.loss = torch.nn.BCEWithLogitsLoss()
+
+    def forward(self, preds,targets):
+        weights = targets*0.8 + 0.1
+        return self.loss(preds,targets,weights)
+        
+    # def WBCEWithLogitsLoss(preds, targets, weights=None):
+        
+    #     return self.loss(preds,targets,weight=weights)
+
+
+

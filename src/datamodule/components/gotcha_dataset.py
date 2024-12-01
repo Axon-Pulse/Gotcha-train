@@ -96,12 +96,15 @@ class GotchaDataset(torch.utils.data.Dataset):
         raw_sample_path = row[self.dataset_keys.df_raw_data_sample_key]
     
         raw_sample = self.get_sample_from_path(raw_sample_path)
-        # if self.transformation:
-        #     raw_sample = self.transformation(raw_sample)
+        raw_sample = torch.as_tensor(raw_sample)
+        # Move detections to batch dimension
+        # raw_sample = np.expand_dims(raw_sample, axis=1)
+
+        if self.transformation:
+            raw_sample = self.transformation(raw_sample)
         
         
         label_dict = {"label": np.array(self.labels[idx])*1.0}
-
 
         return raw_sample, label_dict
 
@@ -130,6 +133,8 @@ class GotchaDataset(torch.utils.data.Dataset):
         else:
             print(f"unsupported file format for {sample_path}")
         return raw_sample
+
+
 
     def build_from_raw_data(self, root_dir: os.PathLike):
         all_data = []
@@ -190,3 +195,4 @@ class GotchaDataset(torch.utils.data.Dataset):
 
 if __name__ == "__main__":
     _ = GotchaDataset()
+    pass

@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import math
 
 class TodB(nn.Module):
     """
@@ -43,3 +43,102 @@ class PerChannelNormalize(nn.Module):
         return (x - mean) / std
 
 
+
+
+# Daniel
+class FlipAugmentation(nn.Module):
+    """Flip the doppler vector 
+
+    Args:
+        nn (_type_): _description_
+    """
+    def __init__(self, p=0.5):
+        super().__init__()
+        self.p = p
+        
+    def forward(self, x):
+        if (torch.rand(1) > self.p):
+            return x
+        n = math.floor(self.p * x.shape[0])
+        indices = torch.randint(0, x.shape[0], (n,))        
+        x[indices,6:] = torch.flip(x[indices,6:], dims=[1])  ##????
+        # return x.squeeze(dim=0)
+        return x
+
+    
+class GotchaNormalize(nn.Module):
+    """ Normalize only the doppler vector
+
+    Args:
+        nn (_type_): _description_
+    """
+    def __init__(self,method='std_mean'):
+        super().__init__()
+        self.method = method
+
+    def forward(self, x):
+
+        if (self.method == 'std_mean'):
+            mean = x[:,6:].mean(dim=[-1], keepdim=True)
+            std = x[:,6:].std(dim=[-1], keepdim=True)
+            std = std + 1e-7
+            x[:,6:] = (x[:,6:] - mean) / std
+            return x
+        elif (self.method == 'min_max'):
+            min = x[:,6:].min(dim=-1)[0].unsqueeze(-1)
+            max = x[:,6:].max(dim=-1)[0].unsqueeze(-1)
+            max = max - min + 1e-7
+            x[:,6:] = (x[:,6:] - min) / max
+            return x
+        
+        return x
+
+class LowerSnr(nn.Module):
+    """TODO
+
+    Args:
+        nn (_type_): _description_
+    """
+    def __init__(self, p=0.5):
+        super().__init__()
+        self.p = p
+        
+    def forward(self,x):
+        pass
+
+
+class AddNoise(nn.Module):
+    """TODO
+
+    Args:
+        nn (_type_): _description_
+    """
+    def __init__(self, p=0.5,method='speckle'):
+        super().__init__()
+        self.p = p
+        self.method = method
+        self.speckle_variance = 0.1
+
+    def forward(self,x):
+        if (torch.rand(1) > self.p):
+            return x
+        
+        if self.method=='speckle':
+            speckle = torch.normal(1, self.speckle_variance, x[:,6:].shape)
+            x[:,6:] = x[:,6:] * speckle 
+        elif self.method=='gaussian':
+            pass
+        
+        return x
+
+
+if __name__ == "__main__":
+    x = torch.rand(1000,134)
+    flip = FlipAugmentation()
+    y = flip(x)
+
+    x = torch.rand(1000,134)
+    norm = GotchaNormalize('min_max')
+    y = norm(x)
+
+    pass
