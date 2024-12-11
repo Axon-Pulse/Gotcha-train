@@ -52,20 +52,24 @@ class FlipAugmentation(nn.Module):
     Args:
         nn (_type_): _description_
     """
-    def __init__(self, p=0.5):
+    def __init__(self, p=0.5, vector_offset=6):
         super().__init__()
         self.p = p
+        self.vector_offset = vector_offset
         
     def forward(self, x):
         if (torch.rand(1) > self.p):
             return x
-        n = math.floor(self.p * x.shape[0])
-        indices = torch.randint(0, x.shape[0], (n,))        
-        x[indices,6:] = torch.flip(x[indices,6:], dims=[1])  ##????
+        if x.ndim == 1:
+            x[self.vector_offset:] = torch.flip(x[self.vector_offset:])
+        elif x.ndim == 2:
+            n = math.floor(self.p * x.shape[0])
+            indices = torch.randint(0, x.shape[0], (n,))        
+            x[indices,6:] = torch.flip(x[indices,6:], dims=[1])  ##????
         # return x.squeeze(dim=0)
         return x
 
-    
+
 class GotchaNormalize(nn.Module):
     """ Normalize only the doppler vector
 
@@ -78,20 +82,35 @@ class GotchaNormalize(nn.Module):
 
     def forward(self, x):
 
-        if (self.method == 'std_mean'):
-            mean = x[:,6:].mean(dim=[-1], keepdim=True)
-            std = x[:,6:].std(dim=[-1], keepdim=True)
-            std = std + 1e-7
-            x[:,6:] = (x[:,6:] - mean) / std
+        if self.method == 'std_mean':
+            if x.ndim == 1:
+                # For 1D vector
+                mean = x.mean()
+                std = x.std()
+                std = std + 1e-7
+                x = (x- mean) / std
+            elif x.ndim == 2:
+                # For 2D array
+                mean = x.mean(dim=-1, keepdim=True)
+                std = x.std(dim=-1, keepdim=True)
+                std = std + 1e-7
+                x = (x - mean) / std
             return x
-        elif (self.method == 'min_max'):
-            min = x[:,6:].min(dim=-1)[0].unsqueeze(-1)
-            max = x[:,6:].max(dim=-1)[0].unsqueeze(-1)
-            max = max - min + 1e-7
-            x[:,6:] = (x[:,6:] - min) / max
+
+        elif self.method == 'min_max':
+            if x.ndim == 1:
+                # For 1D vector
+                min_val = x.min()
+                max_val = x.max()
+                max_val = max_val - min_val + 1e-7
+                x = (x - min_val) / max_val
+            elif x.ndim == 2:
+                # For 2D array
+                min_val = x.min(dim=-1, keepdim=True)[0]
+                max_val = x.max(dim=-1, keepdim=True)[0]
+                max_val = max_val - min_val + 1e-7
+                x = (x - min_val) / max_val
             return x
-        
-        return x
 
 class LowerSnr(nn.Module):
     """TODO
@@ -113,19 +132,24 @@ class AddNoise(nn.Module):
     Args:
         nn (_type_): _description_
     """
-    def __init__(self, p=0.5,method='speckle'):
+    def __init__(self, p=0.5,method='speckle', vector_offset=6):
         super().__init__()
         self.p = p
         self.method = method
         self.speckle_variance = 0.1
+        self.vector_offset = vector_offset
 
     def forward(self,x):
         if (torch.rand(1) > self.p):
             return x
         
         if self.method=='speckle':
-            speckle = torch.normal(1, self.speckle_variance, x[:,6:].shape)
-            x[:,6:] = x[:,6:] * speckle 
+            if x.ndim == 1:
+                speckle = torch.normal(1, self.speckle_variance, x[self.vector_offset :].shape)
+                x[self.vector_offset :] = x[self.vector_offset :] * speckle
+            elif x.ndim == 2:
+                speckle = torch.normal(1, self.speckle_variance, x[:,6:].shape)
+                x[:,self.vector_offset :] = x[:,self.vector_offset :] * speckle 
         elif self.method=='gaussian':
             pass
         

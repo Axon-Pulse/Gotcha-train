@@ -1,0 +1,30 @@
+train:
+  order: ["GotchaNormalize", "FlipAugmentation"]
+  ToTensor:
+    _target_: torchvision.transforms.ToTensor
+
+  GotchaNormalize:
+    _target_: utils.custom_transforms.GotchaNormalize
+    method: 'min_max'
+
+  FlipAugmentation:
+    _target_: utils.custom_transforms.FlipAugmentation
+    p: 0.5
+    vector_offset: 0
+
+validation:
+  order: ["GotchaNormalize"]
+  GotchaNormalize:
+    _target_: utils.custom_transforms.GotchaNormalize
+    method: 'min_max'
+  # AddNoise:
+  #   _target_: utils.custom_transforms.AddNoise
+  #   p: 0.9
+  #   method: 'speckle'
+# valid_test_predict:
+#   order: ["Resize", "Flip", "ToTensor"]
+#   # other method for using the transformation from the global config,
+#   # thus define on the transformation/transformation_list.yaml its better to use this way for loggability
+#   Resize: ${transformation.Resize}
+#   Flip: ${transformation.Flip}
+#   ToTensor: ${transformation.ToTensor}

@@ -1,0 +1,60 @@
+# Template model configuration yaml
+_target_: src.models.gotcha_lightning_module_v2.GotchaPLModule # path to target network class located at src.models.
+
+# input
+input_shape:
+  - 1 # C
+  - 256 # H
+  - 134 # W
+input_dim: 134
+n_classes: 2
+p_dropout: 0.3
+
+# optimizer related parameters
+optimizer:
+  _target_: torch.optim.Adam # target optimizer class
+  _partial_: true
+  lr: 0.001 # Learning rate
+  weight_decay: 0.0
+
+# schedulers parameters
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau # target scheduler class
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 10
+
+# neural network parameters
+model:
+
+  _target_: src.models.components.simple_1D_cnn.Simple1DCNN_v2 # target nn.Module class model
+  input_channels: 1
+  p_dropout: 0.3
+
+# loss parameters
+loss:
+  _target_: torch.nn.BCEWithLogitsLoss # nn.Module class loss function
+  # _target_: src.utils.losses.LossWraper # nn.Module class loss function
+  # lossFunc: src.utils.losses.WBCEWithLogitsLoss
+
+# metrics parameters
+metric:
+  train_metric:
+    _target_: torchmetrics.classification.BinaryROC
+    thresholds: 1000
+
+  val_metric:
+    _target_: torchmetrics.classification.BinaryROC
+    thresholds: 1000
+
+  test_metric:
+    _target_: torchmetrics.classification.BinaryROC
+    thresholds: 1000
+
+# metric results plotting function
+get_metric_plot_func:
+  _target_: src.utils.utils.get_roc_plot
+  _partial_: True
+
+compile: False
