@@ -1,11 +1,11 @@
 train:
-  order: ["GotchaNormalize","FlipAugmentation",'AddNoise']
+  order: ["GotchaNormalize", "FlipAugmentation", "AddNoise"]
   ToTensor:
     _target_: torchvision.transforms.ToTensor
 
   GotchaNormalize:
     _target_: utils.custom_transforms.GotchaNormalize
-    method: 'std_mean'
+    method: "std_mean"
 
   FlipAugmentation:
     _target_: utils.custom_transforms.FlipAugmentation
@@ -14,7 +14,7 @@ train:
   AddNoise:
     _target_: utils.custom_transforms.AddNoise
     p: 0.9
-    method: 'speckle'
+    method: "speckle"
 # valid_test_predict:
 #   order: ["Resize", "Flip", "ToTensor"]
 #   # other method for using the transformation from the global config,

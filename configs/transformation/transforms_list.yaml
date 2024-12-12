@@ -39,9 +39,7 @@
 #   saturation: 0.2
 #   hue: 0.1
 
-
 # Daniel
 FlipAugmentation:
   _target_: utils.custom_transforms.FlipAugmentation
   p: 0.5
-

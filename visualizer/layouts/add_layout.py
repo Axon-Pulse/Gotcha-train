@@ -1,6 +1,7 @@
 import os
-from dash import Dash, dcc, html, Input, Output, State
+
 import dash_bootstrap_components as dbc
+from dash import Dash, Input, Output, State, dcc, html
 from flask import Flask
 
 import visualizer.callbacks.add_layout_callback as callback
@@ -11,15 +12,21 @@ import visualizer.callbacks.add_layout_callback as callback
 
 # Flask server for deployment
 server = Flask(__name__)
+
+
 def add_layout_layout():
     """
     This function is the layout for the 'add layout' page.
     """
-    layout = dbc.Container([
-        html.H2("Add Layout", style={'textAlign': "center"}),
-    dbc.Row([
-        dbc.Col([
-        dcc.Markdown('''
+    layout = dbc.Container(
+        [
+            html.H2("Add Layout", style={"textAlign": "center"}),
+            dbc.Row(
+                [
+                    dbc.Col(
+                        [
+                            dcc.Markdown(
+                                """
             ### Instructions:
             To integrate your uploaded scripts into the visualizer, follow these steps:
 
@@ -31,15 +38,15 @@ def add_layout_layout():
                 import main_layout
                 import main_callbacks
                 ```
-            5. Ensure that in your **callback** script you import the layout script: 
+            5. Ensure that in your **callback** script you import the layout script:
                 ```python
                 import visualizer.layouts.<layout_script_name>
                ```
-            6. Ensure that in your **layout** script you import the callback script: 
+            6. Ensure that in your **layout** script you import the callback script:
                 ```python
                 import visualizer.callback.<callback_script_name>
                 ```
-            7. For more convenience, in the layout or callback script, create an instance of the Visualization class: 
+            7. For more convenience, in the layout or callback script, create an instance of the Visualization class:
                 ```python
                 visualizer_instance = main_layout.Visualization()
                 ```
@@ -53,64 +60,103 @@ def add_layout_layout():
                ```python
                {'label': '<new_option>', 'value': '<new_option>'}
                ```
-        ''')
-        ],width=12, style={'margin-bottom': '20px'}),
-    dbc.Row([
-        dbc.Col(html.H1("User-Defined Tool Upload"), width=10)]),
-    dbc.Row([
-        dbc.Col(html.H4("Upload the Layout Script:"), width=8)]),
-    dbc.Row([
-        dbc.Col(dcc.Upload(
-            id='upload-layout',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select Files')
-            ]),
-            style={
-                'width': '100%',
-                'height': '40px',
-                'lineHeight': '40px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px'
-            },
-            multiple=False
-        ), width=6)
-    ]),
-    dbc.Row([
-        dbc.Col(html.Div(id='layout-upload-name', style={'marginTop': '10px', 'color':'green'}), width=12)
-    ]),
-    dbc.Row([
-        dbc.Col(html.H4("Upload the Callback Script:"), width=8)]),
-    dbc.Row([
-        dbc.Col(dcc.Upload(
-            id='upload-callback',
-            children=html.Div([
-                'Drag and Drop or ',
-                html.A('Select Files')
-            ]),
-            style={
-                'width': '100%',
-                'height': '40px',
-                'lineHeight': '40px',
-                'borderWidth': '1px',
-                'borderStyle': 'dashed',
-                'borderRadius': '5px',
-                'textAlign': 'center',
-                'margin': '10px'
-            },
-            multiple=False
-        ), width=6)
-    ]),
-    dbc.Row([
-        dbc.Col(html.Div(id='callback-upload-name', style={'marginTop': '10px', 'color':'green'}), width=12)
-    ]),
-    dbc.Row([
-        dbc.Col(dbc.Button("Upload", id='upload-button', n_clicks=0), width=4)]),
-    dbc.Row([
-        dbc.Col(dcc.Loading(id="loading", children=[html.Div(id='output-status')], type="default"), width=12)]),
-    ])
-], fluid= True)
+        """
+                            )
+                        ],
+                        width=12,
+                        style={"margin-bottom": "20px"},
+                    ),
+                    dbc.Row([dbc.Col(html.H1("User-Defined Tool Upload"), width=10)]),
+                    dbc.Row([dbc.Col(html.H4("Upload the Layout Script:"), width=8)]),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Upload(
+                                    id="upload-layout",
+                                    children=html.Div(
+                                        ["Drag and Drop or ", html.A("Select Files")]
+                                    ),
+                                    style={
+                                        "width": "100%",
+                                        "height": "40px",
+                                        "lineHeight": "40px",
+                                        "borderWidth": "1px",
+                                        "borderStyle": "dashed",
+                                        "borderRadius": "5px",
+                                        "textAlign": "center",
+                                        "margin": "10px",
+                                    },
+                                    multiple=False,
+                                ),
+                                width=6,
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                html.Div(
+                                    id="layout-upload-name",
+                                    style={"marginTop": "10px", "color": "green"},
+                                ),
+                                width=12,
+                            )
+                        ]
+                    ),
+                    dbc.Row([dbc.Col(html.H4("Upload the Callback Script:"), width=8)]),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Upload(
+                                    id="upload-callback",
+                                    children=html.Div(
+                                        ["Drag and Drop or ", html.A("Select Files")]
+                                    ),
+                                    style={
+                                        "width": "100%",
+                                        "height": "40px",
+                                        "lineHeight": "40px",
+                                        "borderWidth": "1px",
+                                        "borderStyle": "dashed",
+                                        "borderRadius": "5px",
+                                        "textAlign": "center",
+                                        "margin": "10px",
+                                    },
+                                    multiple=False,
+                                ),
+                                width=6,
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                html.Div(
+                                    id="callback-upload-name",
+                                    style={"marginTop": "10px", "color": "green"},
+                                ),
+                                width=12,
+                            )
+                        ]
+                    ),
+                    dbc.Row(
+                        [dbc.Col(dbc.Button("Upload", id="upload-button", n_clicks=0), width=4)]
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                dcc.Loading(
+                                    id="loading",
+                                    children=[html.Div(id="output-status")],
+                                    type="default",
+                                ),
+                                width=12,
+                            )
+                        ]
+                    ),
+                ]
+            ),
+        ],
+        fluid=True,
+    )
     return layout

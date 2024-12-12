@@ -1,8 +1,8 @@
 from typing import Any
+
 import hydra
 from omegaconf import DictConfig
 from torchvision.transforms import transforms as TT
-
 
 
 class TransformsWrapper:
@@ -26,7 +26,6 @@ class TransformsWrapper:
             augmentations.append(augmentation)
         self.augmentations = TT.Compose(augmentations)
 
-
     def __call__(self, image: Any, **kwargs: Any) -> Any:
         """Apply TransformsWrapper module.
 
@@ -38,5 +37,3 @@ class TransformsWrapper:
             Any: Transformation results.
         """
         return self.augmentations(image, **kwargs)
-
-

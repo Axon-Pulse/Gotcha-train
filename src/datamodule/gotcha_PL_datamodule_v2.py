@@ -2,12 +2,12 @@ from collections import OrderedDict
 from typing import Any, Dict, Optional, Tuple
 
 import hydra
-import torch
 import numpy as np
+import torch
 from hydra.utils import instantiate
 from lightning import LightningDataModule
 from omegaconf import DictConfig
-from torch.utils.data import DataLoader, Dataset, random_split, WeightedRandomSampler
+from torch.utils.data import DataLoader, Dataset, WeightedRandomSampler, random_split
 
 from src.datamodule.components.transformation import TransformsWrapper
 
@@ -73,7 +73,6 @@ class GotchaDataModule(LightningDataModule):
         self.valid_set: Optional[Dataset] = None
         self.predict_set: Dict[str, Dataset] = OrderedDict()
 
-
     @property
     def num_classes(self) -> int:
         """Get the number of classes.
@@ -83,7 +82,6 @@ class GotchaDataModule(LightningDataModule):
         return self.hparams.model.num_classes
 
     def _get_dataset_(self, split_name: str, dataset_name: Optional[str] = None) -> Dataset:
-
 
         dataset: Dataset = hydra.utils.instantiate(self.cfg_datasets[dataset_name])
         return dataset
@@ -107,42 +105,44 @@ class GotchaDataModule(LightningDataModule):
         """
         # loading an already process dataset
 
-
-        self.main_dataset: Dataset = hydra.utils.instantiate(self.cfg_datasets['main'])  
+        self.main_dataset: Dataset = hydra.utils.instantiate(self.cfg_datasets["main"])
         train_size = int(self.train_val_split[0] * len(self.main_dataset))
         val_size = len(self.main_dataset) - train_size
-        self.train_subset, self.val_subset = random_split(self.main_dataset, [train_size, val_size], generator=torch.Generator().manual_seed(0))
+        self.train_subset, self.val_subset = random_split(
+            self.main_dataset, [train_size, val_size], generator=torch.Generator().manual_seed(0)
+        )
         self.test_set = None
-        self.train_subset.dataset.transformation = TransformsWrapper(self.transforms.get("train"))  # Apply train transforms to the train dataset
-        self.val_subset.dataset.transformation  = TransformsWrapper(self.transforms.get("validation") )
- 
+        self.train_subset.dataset.transformation = TransformsWrapper(
+            self.transforms.get("train")
+        )  # Apply train transforms to the train dataset
+        self.val_subset.dataset.transformation = TransformsWrapper(
+            self.transforms.get("validation")
+        )
 
     def train_dataloader(self) -> DataLoader[Any]:
         """Create and return the train dataloader.
 
         :return: The train dataloader.
         """
-        if self.cfg_datasets['main'].get("weighted_sampling"):
+        if self.cfg_datasets["main"].get("weighted_sampling"):
             subset_labels = np.array(self.main_dataset.labels)[self.train_subset.indices]
             true_labels_count = sum(subset_labels)
             class_counts = np.array([len(subset_labels) - true_labels_count, true_labels_count])
-            
+
             # Assign weights to each sample
             class_weights = 1.0 / class_counts
             sample_weights = [class_weights[int(label)] for label in subset_labels]
             # Create the sampler
             self.sampler = WeightedRandomSampler(
-                weights=sample_weights, 
-                num_samples=len(sample_weights), 
-                replacement=True
+                weights=sample_weights, num_samples=len(sample_weights), replacement=True
             )
         return DataLoader(
             dataset=self.train_subset,
             batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
-            sampler=self.sampler if self.cfg_datasets['main'].get("weighted_sampling") else None,
-            shuffle=True if not self.cfg_datasets['main'].get("weighted_sampling") else False,
+            sampler=self.sampler if self.cfg_datasets["main"].get("weighted_sampling") else None,
+            shuffle=True if not self.cfg_datasets["main"].get("weighted_sampling") else False,
         )
 
     def val_dataloader(self) -> DataLoader[Any]:
@@ -150,29 +150,28 @@ class GotchaDataModule(LightningDataModule):
 
         :return: The validation dataloader.
         """
-        if self.cfg_datasets['main'].get("weighted_sampling"):
+        if self.cfg_datasets["main"].get("weighted_sampling"):
             subset_labels = np.array(self.main_dataset.labels)[self.val_subset.indices]
             true_labels_count = sum(subset_labels)
             class_counts = np.array([len(subset_labels) - true_labels_count, true_labels_count])
-            
+
             # Assign weights to each sample
             class_weights = 1.0 / class_counts
             sample_weights = [class_weights[int(label)] for label in subset_labels]
             # Create the sampler
             self.sampler = WeightedRandomSampler(
-                weights=sample_weights, 
-                num_samples=len(sample_weights), 
+                weights=sample_weights,
+                num_samples=len(sample_weights),
                 replacement=True,
             )
         return DataLoader(
             dataset=self.val_subset,
             batch_size=self.hparams.batch_size,
-            sampler=self.sampler if self.cfg_datasets['main'].get("weighted_sampling") else None,
+            sampler=self.sampler if self.cfg_datasets["main"].get("weighted_sampling") else None,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
-            shuffle=True if not self.cfg_datasets['main'].get("weighted_sampling") else False,
+            shuffle=True if not self.cfg_datasets["main"].get("weighted_sampling") else False,
         )
-
 
 
 if __name__ == "__main__":

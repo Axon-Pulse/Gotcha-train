@@ -14,9 +14,9 @@ datasets:
   main:
     _target_: src.datamodule.components.gotcha_dataset.GotchaDataset
     # csv_path: ${paths.data_dir}/gt_file.csv
-    csv_path: '/home/daniel/Documents/Gotcha/first_drone_exp_filtered/recs_df.csv'
+    csv_path: "/home/daniel/Documents/Gotcha/first_drone_exp_filtered/recs_df.csv"
     # csv_path_labels: '/home/daniel/Documents/Gotcha/first_drone_exp_filtered/gt.pkl'
-    
+
     build_from_raw_data: False
     dataset_keys: #labels mapping in the dataframe
       df_raw_data_sample_key: "full_path" # key in the dataset for the path of the sample

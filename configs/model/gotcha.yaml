@@ -27,7 +27,6 @@ scheduler:
 
 # neural network parameters
 model:
-
   _target_: src.models.components.gotcha_models.Simplest1DCnn # target nn.Module class model
   input_channels: 1
   p_dropout: 0.3

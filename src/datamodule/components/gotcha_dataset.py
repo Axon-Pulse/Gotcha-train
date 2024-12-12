@@ -1,5 +1,6 @@
 import glob
 import os
+import pickle
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import numpy as np
@@ -9,7 +10,7 @@ import scipy.io as sio
 import torch
 from pandas import DataFrame
 from torchvision.transforms import ToPILImage
-import pickle
+
 from src.datamodule.components.transformation import TransformsWrapper
 
 
@@ -38,10 +39,10 @@ class GotchaDataset(torch.utils.data.Dataset):
         """
         super().__init__()
         self.__dict__.update(**kargs)
-       
+
         if csv_path and not dataframe:
             self.dataframe = pd.read_csv(csv_path)
-            with open(csv_path[:-4] + ".pkl", "rb") as fp:   # Unpickling
+            with open(csv_path[:-4] + ".pkl", "rb") as fp:  # Unpickling
                 self.labels = pickle.load(fp)
         else:
             self.dataframe = (
@@ -91,10 +92,10 @@ class GotchaDataset(torch.utils.data.Dataset):
             idx (int): int ~ U[0,len(self.dataset)-1]
         """
         row = self.dataframe.iloc[idx]
-       
+
         # pull and process single sample and label
         raw_sample_path = row[self.dataset_keys.df_raw_data_sample_key]
-    
+
         raw_sample = self.get_sample_from_path(raw_sample_path)
         raw_sample = torch.as_tensor(raw_sample)
         # Move detections to batch dimension
@@ -102,9 +103,8 @@ class GotchaDataset(torch.utils.data.Dataset):
 
         if self.transformation:
             raw_sample = self.transformation(raw_sample)
-        
-        
-        label_dict = {"label": np.array(self.labels[idx])*1.0}
+
+        label_dict = {"label": np.array(self.labels[idx]) * 1.0}
 
         return raw_sample, label_dict
 
@@ -133,8 +133,6 @@ class GotchaDataset(torch.utils.data.Dataset):
         else:
             print(f"unsupported file format for {sample_path}")
         return raw_sample
-
-
 
     def build_from_raw_data(self, root_dir: os.PathLike):
         all_data = []

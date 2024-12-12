@@ -2,14 +2,15 @@ import torch.nn as nn
 from torch import Tensor
 from torch.nn import Sequential
 
-    
+
 class Simple1DCNN_v2(nn.Module):
     """
     Input shape: (x, 134)
     Output shape: ( x)
 
-    simple mlp    
+    simple mlp
     """
+
     def __init__(self, input_dim=128, n_classes=2, **kwargs):
         super().__init__()
         self.conv = nn.Sequential(
@@ -33,8 +34,6 @@ class Simple1DCNN_v2(nn.Module):
         x = x.view(x.size(0), -1)  # Flatten for fully connected layers
         x = self.fc(x)
         return self.sigmoid(x)
-
-    
 
 
 if __name__ == "__main__":

@@ -33,7 +33,7 @@ class ConvBlock(nn.Module):
 class Encoder(nn.Module):
     """A baseline CNN encoder with modified pooling to match reference dimensions."""
 
-    def __init__(self, input_channels: int,**kargs) -> None:
+    def __init__(self, input_channels: int, **kargs) -> None:
         super().__init__()
         # Block 0
         blocks = [

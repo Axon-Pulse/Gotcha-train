@@ -1,13 +1,13 @@
 from typing import Dict, Tuple, Union
 
-import plotly.graph_objects as go
 import plotly.express as px
+import plotly.graph_objects as go
 import torch
 
 # import torch.nn as nn
 from lightning import LightningModule
 from torch import Tensor
-from torchmetrics import MaxMetric, MeanMetric,Accuracy
+from torchmetrics import Accuracy, MaxMetric, MeanMetric
 
 
 class GotchaPLModule(LightningModule):
@@ -53,7 +53,6 @@ class GotchaPLModule(LightningModule):
         ), "metrics (for train, val and test) are required,\
               but not supplied"
         self.__dict__.update(kargs["metric"])
-
 
         # metric objects for calculating and averaging accuracy across batches
         self.train_acc = Accuracy(task="binary")
@@ -116,7 +115,6 @@ class GotchaPLModule(LightningModule):
     def model_step(
         self, batch: Tuple[torch.Tensor, torch.Tensor]
     ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        
         """Perform a single model step on a batch of datamodule.
 
         :param batch: A batch of data (a tuple) containing the input tensor of images and target labels.
@@ -148,7 +146,6 @@ class GotchaPLModule(LightningModule):
         self.val_acc.reset()
         self.val_acc_best.reset()
 
-        
     def training_step(self, batch: Tuple[Tensor, Tensor], batch_idx: int) -> Tensor:
         """Perform a single training step on a batch of data from the training set.
 
@@ -193,29 +190,28 @@ class GotchaPLModule(LightningModule):
         self.val_acc(model_output, targets)
         self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
 
-        if(batch_idx % 1000==0):
+        if batch_idx % 1000 == 0:
             # self.log_samples(batch[0][0][:50])
-            self.log_samples(batch[0][batch[1]['label']==1][:,6:].T,'positive')
-            self.log_samples(batch[0][batch[1]['label']==0][:50,6:].T,'negative')
+            self.log_samples(batch[0][batch[1]["label"] == 1][:, 6:].T, "positive")
+            self.log_samples(batch[0][batch[1]["label"] == 0][:50, 6:].T, "negative")
             # self.log_samples(batch[0][0][batch[1]['label']==1][:,6:].T,'positive')
             # self.log_samples(batch[0][0][batch[1]['label']==0][:50,6:].T,'negative')
 
     def on_validation_epoch_end(self) -> None:
         "Lightning hook that is called when a validation epoch ends."
 
-
         acc = self.val_acc.compute()  # get current val acc
-        
+
         self.val_acc_best(acc)  # update best so far val acc
         # log `val_acc_best` as a value through `.compute()` method, instead of as a metric object
         # otherwise metric would be reset by lightning after each epoch
         self.log("val/acc_best", self.val_acc_best.compute(), sync_dist=True, prog_bar=True)
 
-
         val_metric_results = self.val_metric.compute()
         if self.get_metric_plot_func:
-                val_metric_plot = self.get_metric_plot_func(val_metric_results)
-                self.logger.experiment.log({"Roc": val_metric_plot})
+            val_metric_plot = self.get_metric_plot_func(val_metric_results)
+            self.logger.experiment.log({"Roc": val_metric_plot})
+
     # ******************************************************************************
     #
     #                       Test
@@ -308,7 +304,7 @@ class GotchaPLModule(LightningModule):
             }
         return {"optimizer": optimizer}
 
-    def log_samples(self,sample,name='samples'):
+    def log_samples(self, sample, name="samples"):
         fig = px.imshow(sample.detach().cpu().T)
         self.logger.experiment.log({name: fig})
 

@@ -1,5 +1,7 @@
 import glob
 import os
+import pickle
+import random
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import numpy as np
@@ -8,9 +10,8 @@ import plotly.express as px
 import scipy.io as sio
 import torch
 from pandas import DataFrame
-import random
 from torchvision.transforms import ToPILImage
-import pickle
+
 from src.datamodule.components.transformation import TransformsWrapper
 
 
@@ -39,10 +40,10 @@ class GotchaDataset(torch.utils.data.Dataset):
         """
         super().__init__()
         self.__dict__.update(**kargs)
-       
+
         if csv_path and not dataframe:
             self.dataframe = pd.read_csv(csv_path)
-            with open(csv_path[:-4] + ".pkl", "rb") as fp:   # Unpickling
+            with open(csv_path[:-4] + ".pkl", "rb") as fp:  # Unpickling
                 self.raw_labels = pickle.load(fp)
         else:
             self.dataframe = (
@@ -53,8 +54,10 @@ class GotchaDataset(torch.utils.data.Dataset):
         self.labels = []
         for idx, row in self.dataframe.iterrows():
             raw_sample_path = row[self.dataset_keys.df_raw_data_sample_key]
-        
-            self.data.extend([{"path": raw_sample_path, "vector_index": i} for i in range(row["numDetections"])])
+
+            self.data.extend(
+                [{"path": raw_sample_path, "vector_index": i} for i in range(row["numDetections"])]
+            )
             self.labels.extend(self.raw_labels[idx].tolist())
         # remove some of the false elements
         #  Get indices of all `False` elements
@@ -70,14 +73,13 @@ class GotchaDataset(torch.utils.data.Dataset):
         # Use boolean masking to filter the lists efficiently
         mask = np.ones(len(boolean_list), dtype=bool)
         mask[indices_to_remove] = False
-        
+
         # # Apply the mask to both lists
         self.labels = boolean_list[mask].tolist()  # Convert back to list
         self.data = other_list[mask].tolist()  # Convert back to list
 
         true_labels_count = sum(self.labels)
         self.labels_count = np.array([len(self.labels) - true_labels_count, true_labels_count])
-        
 
     def update_transformation(
         self, transformation: Union[torch.nn.Module, TransformsWrapper, Callable]
@@ -121,8 +123,7 @@ class GotchaDataset(torch.utils.data.Dataset):
             idx (int): int ~ U[0,len(self.dataset)-1]
         """
         vector_dict = self.data[idx]
-       
-    
+
         raw_sample = self.get_sample_from_path(vector_dict["path"])[vector_dict["vector_index"]]
         raw_sample = torch.as_tensor(raw_sample)[6:]
         # Move detections to batch dimension
@@ -130,9 +131,8 @@ class GotchaDataset(torch.utils.data.Dataset):
 
         if self.transformation:
             raw_sample = self.transformation(raw_sample)
-        
-        
-        label = np.array(self.labels[idx])*1.0
+
+        label = np.array(self.labels[idx]) * 1.0
 
         return raw_sample, label
 
@@ -162,8 +162,6 @@ class GotchaDataset(torch.utils.data.Dataset):
             print(f"unsupported file format for {sample_path}")
         return raw_sample
 
-
-
     def build_from_raw_data(self, root_dir: os.PathLike):
         all_data = []
         label_dirs = [
@@ -187,7 +185,6 @@ class GotchaDataset(torch.utils.data.Dataset):
         label_to_index = {label: idx for idx, label in enumerate(combined_df["label"].unique())}
         combined_df["label_index"] = combined_df["label"].apply(lambda x: label_to_index[x])
         return combined_df
-
 
 
 if __name__ == "__main__":

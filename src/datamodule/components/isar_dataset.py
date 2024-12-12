@@ -7,12 +7,13 @@ from typing import Any, Callable, Optional
 import cv2
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import torch
 import torchvision.transforms as T
-from torchvision.transforms import ToPILImage, ToTensor
 from pandas import DataFrame
 from PIL import Image
-import plotly.express as px
+from torchvision.transforms import ToPILImage, ToTensor
+
 
 class ISARDataset(torch.utils.data.Dataset):
     def __init__(
@@ -51,10 +52,10 @@ class ISARDataset(torch.utils.data.Dataset):
         image_path = row["image_path"]
         label = row["label"]
         image = Image.open(image_path).convert("RGB")
-        
+
         if self.transformation:
             image = self.transformation(image)
-        
+
         return image, label
 
     def __plotsample__(self, idx):
@@ -66,20 +67,22 @@ class ISARDataset(torch.utils.data.Dataset):
 
     def __getmodel__(self, idx, model):
         sample_tensor, sample_gt = self.__getitem__(idx)
-        sample_id = self.dataframe.iloc[idx]['id']
-        
+        sample_id = self.dataframe.iloc[idx]["id"]
+
         # Ensure the tensor has the correct dimensions
         sample_tensor = sample_tensor.unsqueeze(1)  # Add batch dimension, shape [1, 1, 256, 512]
         pred_model = model(sample_tensor)
         pred_model = pred_model.mean(dim=0)  # reashpe the tensor from Shape [3,2] to Shape [1, 2]
         pred_model = pred_model.softmax(dim=-1)
         pred_df = pd.DataFrame(pred_model.detach().numpy()).T
-        pred_df.columns=self.dataframe['label'].unique()
-        pred_fig = px.bar(pred_df, 
-                          x = pred_df.columns,
-                          title=f"{sample_id} Prediction results, The real label: {sample_gt}")
+        pred_df.columns = self.dataframe["label"].unique()
+        pred_fig = px.bar(
+            pred_df,
+            x=pred_df.columns,
+            title=f"{sample_id} Prediction results, The real label: {sample_gt}",
+        )
         return pred_fig
-    
+
     def build_from_raw_data(self, root_dir):
         all_data = []
         label_dirs = [

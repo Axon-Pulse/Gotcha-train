@@ -1,7 +1,6 @@
 defaults:
   - gpu
 
-
 min_epochs: 1 # prevents early stopping
 max_epochs: 400
 limit_train_batches: 1000

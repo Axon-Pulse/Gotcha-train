@@ -1,15 +1,14 @@
+import os
 from typing import Any, Dict, List, Tuple
 
-import os
+import dash_bootstrap_components as dbc
 import hydra
 import rootutils
+from dash import Dash, Input, Output, State, callback_context, dcc, html
+from dash.exceptions import PreventUpdate
 from lightning import LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig
-from dash import Dash, html, dcc, Input, Output, State, callback_context
-from dash.exceptions import PreventUpdate
-import dash_bootstrap_components as dbc
-
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 # ------------------------------------------------------------------------------------ #
@@ -37,7 +36,7 @@ from src.utils import (
     log_hyperparameters,
     task_wrapper,
 )
-from visualizer import main_layout,main_callbacks
+from visualizer import main_callbacks, main_layout
 
 log = RankedLogger(__name__, rank_zero_only=True)
 
@@ -84,41 +83,43 @@ def prediction(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
     metric_dict = trainer.callback_metrics
     # print(f'the dataset is: {datamodule.cfg_datasets.main}')
-    visualizer_instance = main_layout.Visualization(dataset=datamodule.predict_dataloader()[0].dataset,
-                                                    model=model, 
-                                                    transforms=cfg.transformation,
-                                                    default_transforms = cfg.datamodule.transforms,
-                                                    # predict_transform = cfg.datamodule.transforms.valid_test_predict
-                                                    )
+    visualizer_instance = main_layout.Visualization(
+        dataset=datamodule.predict_dataloader()[0].dataset,
+        model=model,
+        transforms=cfg.transformation,
+        default_transforms=cfg.datamodule.transforms,
+        # predict_transform = cfg.datamodule.transforms.valid_test_predict
+    )
 
-    app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
-    app.layout = html.Div(id="default-view", 
-            children=[
-            html.Img(src='/assets/axon_logo.png', style={'height': '150px', 'width': '150px'}),
-            html.H1('Visualizator', style={'textAlign': "center"}),
+    app = Dash(
+        __name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True
+    )
+    app.layout = html.Div(
+        id="default-view",
+        children=[
+            html.Img(src="/assets/axon_logo.png", style={"height": "150px", "width": "150px"}),
+            html.H1("Visualizator", style={"textAlign": "center"}),
             html.Hr(),
             visualizer_instance.default_layout(),
-    # change the layout of the page based on the selected option:
-            html.Div(id='page-content'),
-            ])
-    app.css.append_css({
-        'external_url': 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
-    })
+            # change the layout of the page based on the selected option:
+            html.Div(id="page-content"),
+        ],
+    )
+    app.css.append_css(
+        {
+            "external_url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        }
+    )
 
-    app.css.append_css({
-        'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
-    })
+    app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
-    app.css.append_css({
-        'external_url': 'https://codepen.io/chriddyp/pen/brPBPO.css'
-    })
-
+    app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/brPBPO.css"})
 
     main_callbacks.visualizer_callbacks(app, visualizer_instance)
     app.run_server(debug=True)
 
-        # if cfg.lunch_gradio_app:
-        #     BasicGradioApp(model, datamodule, trainer, csv_path=cfg.paths.predict_data_csv_path)
+    # if cfg.lunch_gradio_app:
+    #     BasicGradioApp(model, datamodule, trainer, csv_path=cfg.paths.predict_data_csv_path)
     return metric_dict
 
 

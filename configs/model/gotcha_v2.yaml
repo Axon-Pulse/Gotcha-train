@@ -27,7 +27,6 @@ scheduler:
 
 # neural network parameters
 model:
-
   _target_: src.models.components.simple_1D_cnn.Simple1DCNN_v2 # target nn.Module class model
   input_channels: 1
   p_dropout: 0.3
