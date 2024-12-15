@@ -33,6 +33,7 @@ class Simple1DCNN_v2(nn.Module):
         x = self.conv(x)
         x = x.view(x.size(0), -1)  # Flatten for fully connected layers
         x = self.fc(x)
+        a = 1
         return self.sigmoid(x)
 
 
