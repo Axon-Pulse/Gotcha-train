@@ -66,8 +66,7 @@ class FlipAugmentation(nn.Module):
         elif x.ndim == 2:
             n = math.floor(self.p * x.shape[0])
             indices = torch.randint(0, x.shape[0], (n,))
-            x[indices, 6:] = torch.flip(x[indices, 6:], dims=[1])  ##????
-        # return x.squeeze(dim=0)
+            x[indices, 6:] = torch.flip(x[indices, 6:], dims=[1])
         return x
 
 

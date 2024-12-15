@@ -5,7 +5,7 @@ train:
 
   GotchaNormalize:
     _target_: utils.custom_transforms.GotchaNormalize
-    method: "min_max"
+    method: "standard" #min-max or standart
 
   FlipAugmentation:
     _target_: utils.custom_transforms.FlipAugmentation

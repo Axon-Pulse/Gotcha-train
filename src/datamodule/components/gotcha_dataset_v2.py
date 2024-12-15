@@ -64,7 +64,7 @@ class GotchaDataset(torch.utils.data.Dataset):
         boolean_list = np.array(self.labels)
         other_list = np.array(self.data)
         # Get indices of all `False` elements
-        false_indices = np.where(boolean_list == False)[0]
+        false_indices = np.where(~boolean_list)[0]
 
         # Randomly select a quarter of `False` indices to remove
         num_to_remove = int(len(false_indices) // 1.0001)

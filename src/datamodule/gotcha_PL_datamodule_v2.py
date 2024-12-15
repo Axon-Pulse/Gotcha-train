@@ -175,4 +175,4 @@ class GotchaDataModule(LightningDataModule):
 
 
 if __name__ == "__main__":
-    _ = GenericDataModule()
+    _ = GotchaDataModule()
