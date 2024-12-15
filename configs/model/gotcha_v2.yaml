@@ -12,9 +12,10 @@ p_dropout: 0.3
 
 # optimizer related parameters
 optimizer:
-  _target_: torch.optim.Adam # target optimizer class
+  _target_: torch.optim.SGD # target optimizer class
   _partial_: true
-  lr: 0.001 # Learning rate
+  lr: 0.01 # Learning rate
+  momentum: 0.9
   weight_decay: 0.0
 
 # schedulers parameters

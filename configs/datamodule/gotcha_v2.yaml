@@ -11,7 +11,7 @@ train_val_split: [0.8, 0.2]
 datasets:
   main:
     _target_: src.datamodule.components.gotcha_dataset_v2.GotchaDataset
-    csv_path: "/home/benik/Documents/Gotcha/first_drone_exp_filtered/gt_with_recs_stats_df.csv"
+    csv_path: "/home/benik/Documents/Gotcha/first_drone_exp_filtered/gt_with_recs_stats_df_100.csv"
     weighted_sampling: True
     build_from_raw_data: False
     dataset_keys: #labels mapping in the dataframe
