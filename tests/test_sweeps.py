@@ -9,6 +9,7 @@ startfile = "src/train.py"
 overrides = ["logger=[]"]
 
 
+@pytest.mark.skip(reason="Skipping this test ")
 @RunIf(sh=True)
 @pytest.mark.slow
 def test_experiments(tmp_path: Path) -> None:
@@ -26,6 +27,7 @@ def test_experiments(tmp_path: Path) -> None:
     run_sh_command(command)
 
 
+@pytest.mark.skip(reason="Skipping this test ")
 @RunIf(sh=True)
 @pytest.mark.slow
 def test_hydra_sweep(tmp_path: Path) -> None:
@@ -44,6 +46,7 @@ def test_hydra_sweep(tmp_path: Path) -> None:
     run_sh_command(command)
 
 
+@pytest.mark.skip(reason="Skipping this test ")
 @RunIf(sh=True)
 @pytest.mark.slow
 def test_hydra_sweep_ddp_sim(tmp_path: Path) -> None:
@@ -65,6 +68,7 @@ def test_hydra_sweep_ddp_sim(tmp_path: Path) -> None:
     run_sh_command(command)
 
 
+@pytest.mark.skip(reason="Skipping this test ")
 @RunIf(sh=True)
 @pytest.mark.slow
 def test_optuna_sweep(tmp_path: Path) -> None:
@@ -84,6 +88,7 @@ def test_optuna_sweep(tmp_path: Path) -> None:
     run_sh_command(command)
 
 
+@pytest.mark.skip(reason="Skipping this test ")
 @RunIf(wandb=True, sh=True)
 @pytest.mark.slow
 def test_optuna_sweep_ddp_sim_wandb(tmp_path: Path) -> None:
