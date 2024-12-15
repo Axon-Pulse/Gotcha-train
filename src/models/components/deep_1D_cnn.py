@@ -1,6 +1,7 @@
 import torch.nn as nn
 from torch import Tensor
 
+
 class Deeper1DCNN(nn.Module):
     """
     A deeper 1D CNN for binary classification.
@@ -8,6 +9,7 @@ class Deeper1DCNN(nn.Module):
     Input shape: (batch_size, input_dim)
     Output shape: (batch_size)
     """
+
     def __init__(self, input_dim=128, n_classes=2, **kwargs):
         super().__init__()
 
@@ -18,14 +20,12 @@ class Deeper1DCNN(nn.Module):
             nn.Conv1d(32, 32, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2),  # Downsample by 2
-
             # Second block
             nn.Conv1d(32, 64, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.Conv1d(64, 64, kernel_size=3, padding=1),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=2),
-
             # Third block
             nn.Conv1d(64, 128, kernel_size=3, padding=1),
             nn.ReLU(),
@@ -51,6 +51,7 @@ class Deeper1DCNN(nn.Module):
         x = x.view(x.size(0), -1)  # Flatten for fully connected layers
         x = self.fc(x)
         return self.sigmoid(x)
+
 
 # Example usage
 # model = Deeper1DCNN(input_dim=128)
