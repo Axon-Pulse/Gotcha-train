@@ -1,3 +1,4 @@
+import pandas
 import torch.nn as nn
 from torch import Tensor
 from torch.nn import Sequential
@@ -34,6 +35,7 @@ class Simple1DCNN_v2(nn.Module):
         x = x.view(x.size(0), -1)  # Flatten for fully connected layers
         x = self.fc(x)
         a = 1
+        b = 2
         return self.sigmoid(x)
 
 
