@@ -155,3 +155,11 @@ configs/local/default.yaml
 
 # conda
 *.sh
+datamodule/MNIST/raw/t10k-images-idx3-ubyte
+datamodule/MNIST/raw/t10k-images-idx3-ubyte.gz
+datamodule/MNIST/raw/t10k-labels-idx1-ubyte
+datamodule/MNIST/raw/t10k-labels-idx1-ubyte.gz
+datamodule/MNIST/raw/train-images-idx3-ubyte
+datamodule/MNIST/raw/train-images-idx3-ubyte.gz
+datamodule/MNIST/raw/train-labels-idx1-ubyte
+datamodule/MNIST/raw/train-labels-idx1-ubyte.gz

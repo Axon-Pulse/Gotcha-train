@@ -1,0 +1,2 @@
+full_path,seq,timestamp,numDetections,num_true_target,target_range,target_azimuth,target_elevation
+tests/data/gotcha/seq9244_t1730979055.658457.npy,9244,1730979055.65846,2880,0,21.0822044310231,0.534020018716608,0.262075900754432
