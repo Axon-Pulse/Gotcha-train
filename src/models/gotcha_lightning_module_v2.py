@@ -237,7 +237,7 @@ class GotchaPLModule(LightningModule):
         :param batch_idx: The index of the current batch.
         """
         loss, model_output, targets = self.model_step(batch)
-
+        a = 1
         # update and log metrics
         if self.test_metric:
             test_metric_results = self.test_metric(model_output, targets.int())
