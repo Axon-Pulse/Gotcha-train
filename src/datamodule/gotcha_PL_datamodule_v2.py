@@ -104,7 +104,6 @@ class GotchaDataModule(LightningDataModule):
         careful not to execute things like random split twice!
         """
         # loading an already process dataset
-
         self.main_dataset: Dataset = hydra.utils.instantiate(self.cfg_datasets["main"])
         train_size = int(self.train_val_split[0] * len(self.main_dataset))
         val_size = len(self.main_dataset) - train_size
@@ -112,12 +111,14 @@ class GotchaDataModule(LightningDataModule):
             self.main_dataset, [train_size, val_size], generator=torch.Generator().manual_seed(0)
         )
         self.test_set = None
-        self.train_subset.dataset.transformation = TransformsWrapper(
-            self.transforms.get("train")
-        )  # Apply train transforms to the train dataset
-        self.val_subset.dataset.transformation = TransformsWrapper(
-            self.transforms.get("validation")
-        )
+        if self.transforms is not None and "train" in self.transforms:
+            self.train_subset.dataset.transformation = TransformsWrapper(
+                self.transforms.get("train")
+            )
+        if self.transforms is not None and "validation" in self.transforms:
+            self.val_subset.dataset.transformation = TransformsWrapper(
+                self.transforms.get("validation")
+            )
 
     def train_dataloader(self) -> DataLoader[Any]:
         """Create and return the train dataloader.
